@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Firestore - Αυτόματο ID</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; background: #f4f4f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { color: #333; }
+        #live-text { font-weight: bold; color: #007bff; }
+        button {
+            background-color: #28a745; color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #218838; }
+        .status { margin-top: 10px; font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Live Μήνυμα:</h3>
+        <p id="live-text">Περίμενε...</p>
+
+        <hr>
+
+        <h3>Διαχείριση Μαθητών:</h3>
+        <button id="addBtn">Προσθήκη Μαθητή</button>
+        <p id="status" class="status"></p>
+    </div>
+
+    <script type="module">
+        // 1. Εισαγωγή των απαραίτητων λειτουργιών (προσθέσαμε collection & addDoc)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+
+        // 3. Αρχικοποίηση
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- ΛΕΙΤΟΥΡΓΙΑ 1: Real-time Παρακολούθηση (Από το προηγούμενο script σου) ---
+        const docRef = doc(db, "messages", "1");
+        onSnapshot(docRef, (doc) => {
+            if (doc.exists()) {
+                const data = doc.data();
+                document.getElementById("live-text").innerText = data.text;
+                console.log("Νέα δεδομένα:", data.text);
+            } else {
+                document.getElementById("live-text").innerText = "Το έγγραφο 'messages/1' δεν βρέθηκε!";
+            }
+        });
+
+        // --- ΛΕΙΤΟΥΡΓΙΑ 2: Προσθήκη Μαθητή με Αυτόματο ID ---
+        const btn = document.getElementById("addBtn");
+        const statusPara = document.getElementById("status");
+
+        btn.addEventListener("click", async () => {
+            try {
+                statusPara.innerText = "Γίνεται εγγραφή...";
+
+                // Χρησιμοποιούμε addDoc και collection για να φτιαχτεί αυτόματα το ID
+                const newDocRef = await addDoc(collection(db, "students"), {
+                    όνομα: "Νέος Μαθητής",
+                    βαθμός: Math.floor(Math.random() * 20) + 1, // Τυχαίος βαθμός για το παράδειγμα
+                    ημερομηνία: new Date()
+                });
+
+                statusPara.innerText = "Επιτυχία! Νέο ID: " + newDocRef.id;
+                console.log("Το έγγραφο προστέθηκε με ID: ", newDocRef.id);
+            } catch (error) {
+                console.error("Σφάλμα:", error);
+                statusPara.innerText = "Σφάλμα κατά την εγγραφή.";
+            }
+        });
+
+    </script>
+</body>
+</html>
