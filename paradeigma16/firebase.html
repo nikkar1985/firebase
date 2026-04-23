@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Διαγραφή εγγραφού</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; background: #fff4e6; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { color: #d9480f; }
+        button {
+            background-color: #fd7e14; color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #e8590c; }
+        .status { margin-top: 10px; font-size: 0.9em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Ενημέρωση εγγραφού</h3>
+        <p>Πατώντας το κουμπί, θθα κανω ενημέρωση <b>"2"</b> στη συλλογή <b>students</b>.</p>
+
+        <button id="upBtn">Ενημέρωση Χρήστη 2</button>
+        <p id="status" class="status"></p>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    // Τα στοιχεία σου παραμένουν ως έχουν
+    apiKey: "AIzaSyBkAAzbXJU_ce5iyIlhe-m_A2faErLwHlg",
+    authDomain: "check-e615c.firebaseapp.com",
+    projectId: "check-e615c",
+    storageBucket: "check-e615c.firebasestorage.app",
+    messagingSenderId: "522186437023",
+    appId: "1:522186437023:web:04c7b250728104ee0ccdaa"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const upBtn = document.getElementById("upBtn");
+const statusPara = document.getElementById("status");
+
+upBtn.addEventListener("click", () => {
+    statusPara.innerText = "Αναμονή για δεδομένα...";
+
+    const docRef = doc(db, "students", "2");
+
+    onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            statusPara.innerHTML = `
+                <strong>Ηλικία:</strong> ${data.age} <br>
+                <strong>Όνομα:</strong> ${data.name} <br>
+                <strong>Επώνυμο:</strong> ${data.surname}
+            `;
+        } else {
+            statusPara.innerText = "Το έγγραφο δεν βρέθηκε!";
+        }
+    }, (error) => {
+        console.error("Σφάλμα:", error);
+        statusPara.innerText = "Προέκυψε σφάλμα κατά την ανάκτηση.";
+    });
+});
+    </script>
+
+</body>
+</html>
