@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Διαγραφή εγγραφού</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; background: #fff4e6; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { color: #d9480f; }
+        button {
+            background-color: #fd7e14; color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #e8590c; }
+        .status { margin-top: 10px; font-size: 0.9em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Διαγραφή πεδίου</h3>
+        <p>Πατώντας το κουμπί, θα κανω διαγραφή <b>μονο </b> του πεδίου age.</p>
+
+        <button id="delFieldBtn">Διαγραφή πεδίου</button>
+        <p id="status" class="status"></p>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "",
+        authDomain: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: ""
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const btn = document.getElementById("delFieldBtn");
+    const statusPara = document.getElementById("status");
+
+    // Προσθήκη async εδώ για να δουλέψει το await
+    btn.addEventListener("click", async () => {
+        statusPara.innerText = "Αφαίρεση συγκεκριμένου πεδίου...";
+
+        try {
+            const docRef = doc(db, "students", "2");
+
+            // Χρησιμοποιούμε updateDoc με το deleteField()
+            await updateDoc(docRef, {
+                age: deleteField()
+            });
+
+            statusPara.innerText = "Το πεδίο 'age' διαγράφτηκε με επιτυχία!";
+        } catch (error) {
+            console.error("Σφάλμα:", error);
+            statusPara.innerText = "Προέκυψε σφάλμα κατά τη διαγραφή.";
+        }
+    });
+
+    </script>
+
+</body>
+</html>
