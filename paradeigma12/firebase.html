@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Firestore - Custom ID</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; background: #fff4e6; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { color: #d9480f; }
+        button {
+            background-color: #fd7e14; color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #e8590c; }
+        .status { margin-top: 10px; font-size: 0.9em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Δημιουργία με δικό μας ID:</h3>
+        <p>Πατώντας το κουμπί, θα δημιουργηθεί ένα έγγραφο με το σταθερό ID <b>"user_100"</b> στη συλλογή <b>users</b>.</p>
+
+        <button id="setBtn">Δημιουργία Χρήστη 100</button>
+        <p id="status" class="status"></p>
+    </div>
+
+    <script type="module">
+        // 1. Εισαγωγή των απαραίτητων λειτουργιών (εδώ χρειαζόμαστε setDoc)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 2. Οι δικές σου ρυθμίσεις
+        const firebaseConfig = {
+  apiKey: "AIzaSyBkAAzbXJU_ce5iyIlhe-m_A2faErLwHlg",
+  authDomain: "check-e615c.firebaseapp.com",
+  projectId: "check-e615c",
+  storageBucket: "check-e615c.firebasestorage.app",
+  messagingSenderId: "522186437023",
+  appId: "1:522186437023:web:04c7b250728104ee0ccdaa"
+};
+        // 3. Αρχικοποίηση
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 4. Λειτουργία setDoc (Δικό μας ID)
+        const btn = document.getElementById("setBtn");
+        const statusPara = document.getElementById("status");
+
+        btn.addEventListener("click", async () => {
+            try {
+                statusPara.innerText = "Γίνεται αποθήκευση...";
+
+                // Ορίζουμε εμείς το ID: "users" είναι η συλλογή, "user_100" το ID
+                const customDocRef = doc(db, "newusers", "user_100");
+
+                await setDoc(customDocRef, {
+                    username: "George123",
+                    email: "george@example.com",
+                    points: 500,
+                    lastLogin: new Date()
+                });
+
+                statusPara.innerText = "Επιτυχία! Το έγγραφο 'user_100' δημιουργήθηκε/ενημερώθηκε.";
+                console.log("Το έγγραφο αποθηκεύτηκε με ID: user_100");
+            } catch (error) {
+                console.error("Σφάλμα:", error);
+                statusPara.innerText = "Σφάλμα κατά την αποθήκευση.";
+            }
+        });
+
+    </script>
+</body>
+</html>
