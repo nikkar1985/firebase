@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Διαγραφή εγγραφού</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 500px; background: #fff4e6; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { color: #d9480f; }
+        button {
+            background-color: #fd7e14; color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #e8590c; }
+        .status { margin-top: 10px; font-size: 0.9em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Ενημέρωση εγγραφού</h3>
+        <p>Πατώντας το κουμπί, θθα κανω ενημέρωση <b>"2"</b> στη συλλογή <b>students</b>.</p>
+
+        <button id="upBtn">Ενημέρωση Χρήστη 2</button>
+        <p id="status" class="status"></p>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+          apiKey: "",
+          authDomain: "",
+          projectId: "",
+          storageBucket: "",
+          messagingSenderId: "",
+          appId: ""
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const upBtn = document.getElementById("upBtn");
+      const statusPara = document.getElementById("status");
+
+      upBtn.addEventListener("click", async () => {
+          try {
+              statusPara.innerText = "Ανάκτηση δεδομένων...";
+
+              const docRef = doc(db, "students", "2");
+              const s = await getDoc(docRef);
+
+              if (s.exists()) {
+                  const data = s.data();
+                  statusPara.innerHTML = `
+                      <strong>Ηλικία:</strong> ${data.age} <br>
+                      <strong>Όνομα:</strong> ${data.name} <br>
+                      <strong>Επώνυμο:</strong> ${data.surname}
+                  `;
+              } else {
+                  statusPara.innerText = "Το έγγραφο δεν βρέθηκε!";
+              }
+          } catch (error) {
+              console.error("Σφάλμα:", error);
+              statusPara.innerText = "Προέκυψε σφάλμα κατά την ανάκτηση.";
+          }
+      });
+    </script>
+
+</body>
+</html>
